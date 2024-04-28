@@ -1,0 +1,56 @@
+import { Fragment } from "react";
+import { useState } from "react";
+function Header(){
+    const [img,setImg] = useState("");
+    const[loading,setLoading]=useState(false);
+    const[qrcode,setQrData]=useState("https://youtube.com/");
+    const[size,onsize]=useState(140);
+    async function duck(){
+        setLoading(false);
+        try{
+            alert("Qr code is generated");
+            const url=`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(qrcode)}
+            `;
+            setImg(url);
+        }
+        catch (error){
+            console.error("Sorry somenthing went wrong",error);
+        }
+        finally{
+            setLoading(false);
+        }
+    }
+    function download(){
+        fetch(img)
+        .then((response) => response.blob()) 
+        .then((blob) => {
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.download = "qrcode.png";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        })
+    }
+    return (
+        <>
+        <i className="head">QR CODE GENERATOR</i>
+        <div className="container">
+            {loading && <p>Please wait........</p>}
+            {img && <img src={img} alt="fuck"  width={200} height={200}/>}
+           <label htmlFor="dataInput" className="label1">Data for QR code : </label>
+           <input type="text"  value={qrcode} onChange={(e)=>setQrData(e.target.value)} className="input1" placeholder="Enter data for QR code"/> 
+           
+           <label htmlFor="SizeInput" className="label2">Image size :(eg 150px)</label>
+           <input type="text" value={size} onChange={(e)=>onsize(e.target.value)} className="input2" placeholder="Enter image size "/>
+           <div className="but">
+           <button className="button" onClick={duck}>Generate QR code</button>
+           <button className="secbutton" onClick={download}>Downlode QR code</button>
+           </div>
+        </div>
+        
+        </>
+    );
+}
+export default Header;
